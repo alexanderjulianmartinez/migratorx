@@ -119,13 +119,13 @@ This explicit step is intentional and required.
 
 ## CLI Overview
 
-`migratorx plan migration.yaml`
-`migratorx preflight`
-`migratorx upgrade replica mysql-replica-1`
-`migratorx validate replica mysql-replica-1`
-`migratorx cdc check`
-`migratorx promote mysql-replica-1`
-`migratorx validate primary`
+- `migratorx plan migration.yaml`
+- `migratorx preflight`
+- `migratorx upgrade replica mysql-replica-1`
+- `migratorx validate replica mysql-replica-1`
+- `migratorx cdc check`
+- `migratorx promote mysql-replica-1`
+- `migratorx validate primary`
 
 All commands are safe to re-run.
 
