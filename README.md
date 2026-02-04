@@ -1,4 +1,4 @@
-# migratorx
+# MigratorX
 MigratorX is a safety-first orchestration tool for MySQL major version upgrades.
 
 It helps teams plan, validate, and execute upgrades like MySQL 5.7 → 8.0 with confidence—especially in environments running CDC (e.g., Debezium)—by surfacing risk before it becomes production impact.
