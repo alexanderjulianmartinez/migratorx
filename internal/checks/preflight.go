@@ -1,5 +1,4 @@
 package checks
-package checks
 
 import (
 	"context"
