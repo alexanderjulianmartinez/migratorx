@@ -44,12 +44,12 @@ func (c *MySQLCompatibilityCheck) Run(ctx context.Context, input Input) ([]Findi
 
 	findings := []Finding{}
 
-	if input.Plan != nil {
-		if input.Plan.SourceVersion != "5.7" || input.Plan.TargetVersion != "8.0" {
+	if input.PlanSourceVersion != "" || input.PlanTargetVersion != "" {
+		if input.PlanSourceVersion != "5.7" || input.PlanTargetVersion != "8.0" {
 			findings = append(findings, Finding{
 				Severity: SeverityWarn,
 				Message:  "compatibility check tuned for 5.7 → 8.0 upgrades",
-				Meta:     map[string]interface{}{"source_version": input.Plan.SourceVersion, "target_version": input.Plan.TargetVersion},
+				Meta:     map[string]interface{}{"source_version": input.PlanSourceVersion, "target_version": input.PlanTargetVersion},
 			})
 		}
 	}

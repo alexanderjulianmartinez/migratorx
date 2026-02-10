@@ -92,7 +92,7 @@ func handlePreflight(args []string) {
 	}
 	checksList := buildChecks(*primarySchema, *replicaSchema, *cdcStatus, plan.Topology.Primary, replicaHost, plan)
 	runner := checks.NewRunner(checksList, log.Default())
-	summary, results, err := runner.Run(context.Background(), checks.Input{Plan: &plan})
+	summary, results, err := runner.Run(context.Background(), planInput(plan, replicaHost))
 	if err != nil {
 		writeOutput(Output{Summary: Summary{Block: 1}, Findings: []OutputFinding{{Severity: "BLOCK", Message: err.Error()}}})
 		return
@@ -148,7 +148,14 @@ func handleValidate(args []string) {
 	planPath := fs.String("plan", "migration.yaml", "path to migration plan YAML")
 	primarySchema := fs.String("schema-primary", "", "path to primary schema JSON")
 	replicaSchema := fs.String("schema-replica", "", "path to replica schema JSON")
-	_ = fs.Parse(args[1:])
+	if args[0] == "replica" {
+		if len(args) < 2 {
+			printUsageAndExit()
+		}
+		_ = fs.Parse(args[2:])
+	} else {
+		_ = fs.Parse(args[1:])
+	}
 
 	plan, err := workflow.LoadPlan(*planPath)
 	if err != nil {
@@ -162,7 +169,7 @@ func handleValidate(args []string) {
 			printUsageAndExit()
 		}
 		check := buildSchemaParityCheck(*primarySchema, *replicaSchema, plan.Topology.Primary, args[1])
-		findings, err := check.Run(context.Background(), checks.Input{Plan: &plan})
+		findings, err := check.Run(context.Background(), planInput(plan, args[1]))
 		if err != nil {
 			writeOutput(Output{Summary: Summary{Block: 1}, Findings: []OutputFinding{{Severity: "BLOCK", Message: err.Error()}}})
 			return
@@ -175,7 +182,7 @@ func handleValidate(args []string) {
 			return
 		}
 		check := buildSchemaParityCheck(*primarySchema, *replicaSchema, plan.Topology.Primary, replicaHost)
-		findings, err := check.Run(context.Background(), checks.Input{Plan: &plan})
+		findings, err := check.Run(context.Background(), planInput(plan, replicaHost))
 		if err != nil {
 			writeOutput(Output{Summary: Summary{Block: 1}, Findings: []OutputFinding{{Severity: "BLOCK", Message: err.Error()}}})
 			return
@@ -202,7 +209,7 @@ func handleCDC(args []string) {
 	}
 
 	check := buildDebeziumCheck(*cdcStatus, plan.CDC.Connector)
-	findings, err := check.Run(context.Background(), checks.Input{Plan: &plan})
+	findings, err := check.Run(context.Background(), planInput(plan, ""))
 	if err != nil {
 		writeOutput(Output{Summary: Summary{Block: 1}, Findings: []OutputFinding{{Severity: "BLOCK", Message: err.Error()}}})
 		return
@@ -232,8 +239,8 @@ func handlePromote(args []string) {
 		return
 	}
 	checksList := buildChecks(*primarySchema, *replicaSchema, *cdcStatus, plan.Topology.Primary, replicaHost, plan)
-	gate := checks.PromotionGate{Checks: checksList, ConfirmationPhrase: *phrase}
-	summary, findings, err := gate.Run(context.Background(), checks.Input{Plan: &plan}, *confirm)
+	gate := workflow.PromotionGate{Checks: checksList, ConfirmationPhrase: *phrase}
+	summary, findings, err := gate.Run(context.Background(), planInput(plan, replicaHost), *confirm)
 	if err != nil {
 		writeOutput(Output{Summary: Summary{Block: 1}, Findings: []OutputFinding{{Severity: "BLOCK", Message: err.Error()}}})
 		return
@@ -420,4 +427,14 @@ func selectReplica(plan workflow.MigrationPlan) (string, error) {
 		return "", fmt.Errorf("no replicas defined in plan")
 	}
 	return plan.Topology.Replicas[0], nil
+}
+
+func planInput(plan workflow.MigrationPlan, replicaHost string) checks.Input {
+	return checks.Input{
+		PlanSourceVersion: plan.SourceVersion,
+		PlanTargetVersion: plan.TargetVersion,
+		PrimaryHost:       plan.Topology.Primary,
+		ReplicaHost:       replicaHost,
+		CDCConnector:      plan.CDC.Connector,
+	}
 }

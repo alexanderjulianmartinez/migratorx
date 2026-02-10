@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-
-	"migratorx/internal/workflow"
 )
 
 // Severity indicates the importance of a preflight finding.
@@ -47,7 +45,11 @@ type Summary struct {
 
 // Input captures contextual data for checks. Extend as needed.
 type Input struct {
-	Plan *workflow.MigrationPlan
+	PlanSourceVersion string
+	PlanTargetVersion string
+	PrimaryHost       string
+	ReplicaHost       string
+	CDCConnector      string
 }
 
 // PreflightCheck is a read-only validation that emits findings.
