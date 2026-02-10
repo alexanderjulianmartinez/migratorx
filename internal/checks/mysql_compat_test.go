@@ -33,7 +33,7 @@ func TestMySQLCompatibility_MissingPrimaryKeyBlocks(t *testing.T) {
 		PrimaryHost:     "primary",
 	}
 
-	findings, err := check.Run(context.Background(), Input{})
+	findings, err := check.Run(context.Background(), Input{PlanSourceVersion: "5.7", PlanTargetVersion: "8.0"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -50,7 +50,7 @@ func TestMySQLCompatibility_DeprecatedFeaturesBlock(t *testing.T) {
 		DeprecatedFeatures: []string{"OLD_AUTH"},
 	}
 
-	findings, err := check.Run(context.Background(), Input{})
+	findings, err := check.Run(context.Background(), Input{PlanSourceVersion: "5.7", PlanTargetVersion: "8.0"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestMySQLCompatibility_SQLModeWarns(t *testing.T) {
 		DeprecatedSQLModes: []string{"NO_ZERO_DATE"},
 	}
 
-	findings, err := check.Run(context.Background(), Input{})
+	findings, err := check.Run(context.Background(), Input{PlanSourceVersion: "5.7", PlanTargetVersion: "8.0"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -89,7 +89,7 @@ func TestMySQLCompatibility_CharsetCollationWarns(t *testing.T) {
 		RiskyCollations: []string{"utf8_general_ci"},
 	}
 
-	findings, err := check.Run(context.Background(), Input{})
+	findings, err := check.Run(context.Background(), Input{PlanSourceVersion: "5.7", PlanTargetVersion: "8.0"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
