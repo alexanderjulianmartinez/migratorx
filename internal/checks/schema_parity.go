@@ -11,6 +11,7 @@ type Column struct {
 	Type      string
 	Nullable  bool
 	Default   *string
+	Charset   string
 	Collation string
 }
 
