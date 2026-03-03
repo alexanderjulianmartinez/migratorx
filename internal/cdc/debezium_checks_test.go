@@ -24,7 +24,7 @@ func TestDebeziumHealthCheck_TaskFailedBlocks(t *testing.T) {
 	inspector := &fakeDebeziumInspector{status: ConnectorStatus{
 		Name:           "mysql-prod",
 		ConnectorState: "RUNNING",
-		Tasks: []TaskStatus{{ID: 0, State: "FAILED", Trace: "stacktrace"}},
+		Tasks:          []TaskStatus{{ID: 0, State: "FAILED", Trace: "stacktrace"}},
 	}}
 
 	check := &DebeziumHealthCheck{Inspector: inspector, Connector: "mysql-prod"}
